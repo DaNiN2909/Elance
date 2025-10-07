@@ -1,0 +1,208 @@
+{
+     "requirements": [
+          {
+               "id": "RF001",
+               "title": "Criação de conta",
+               "description": "Cadastro com nome, e-mail, senha, tipo, localização (CEP, número, cidade, rua, bairro) e telefone.",
+               "priority": "Alta",
+               "type": "Funcional",
+               "related": [
+                    "RF003",
+                    "RF004",
+                    "RF005",
+                    "RF008",
+                    "RF009",
+                    "RF011"
+               ],
+               "acceptance_criteria": [
+                    "Formulário com todos os campos listados",
+                    "Validação de e-mail e política de senha",
+                    "Senha armazenada de forma segura (hash)",
+                    "Mensagem de sucesso"
+               ]
+          },
+          {
+               "id": "RF002",
+               "title": "Login",
+               "description": "Entrar na conta usando e-mail e senha.",
+               "priority": "Alta",
+               "type": "Funcional",
+               "related": [
+                    "RF001",
+                    "RF004"
+               ],
+               "acceptance_criteria": [
+                    "Página/endpoint de login",
+                    "Autenticação com tokens ou sessão",
+                    "Mensagem de erro em credenciais inválidas"
+               ]
+          },
+          {
+               "id": "RF003",
+               "title": "Edição de perfil",
+               "description": "Editar nome, foto, contato e descrição pessoal.",
+               "priority": "Alta",
+               "type": "Funcional",
+               "related": [
+                    "RF001",
+                    "RF004",
+                    "RF008"
+               ],
+               "acceptance_criteria": [
+                    "Página de edição com campos necessários",
+                    "Preview de foto e upload",
+                    "Persistência das alterações"
+               ]
+          },
+          {
+               "id": "RF004",
+               "title": "Portfólio",
+               "description": "Adicionar/editar portfólio com fotos, vídeos e descrições.",
+               "priority": "Alta",
+               "type": "Funcional",
+               "related": [
+                    "RF001",
+                    "RF003",
+                    "RF005"
+               ],
+               "acceptance_criteria": [
+                    "Interface para criar itens de portfólio",
+                    "Upload e exibição da mídia",
+                    "Edição e remoção de itens"
+               ]
+          },
+          {
+               "id": "RF005",
+               "title": "Feed de publicações",
+               "description": "Visualizar publicações de outros usuários (portfólios, fotos, vídeos), curtir e comentar.",
+               "priority": "Alta",
+               "type": "Funcional",
+               "related": [
+                    "RF004",
+                    "RF008"
+               ],
+               "acceptance_criteria": [
+                    "Feed paginado/ordenado",
+                    "Publicações mostram autor, mídia, curtidas e comentários",
+                    "Botões de curtir/comentar funcionando"
+               ]
+          },
+          {
+               "id": "RF006",
+               "title": "Curtir publicações",
+               "description": "Registrar e exibir curtidas; permitir remoção (descurtir).",
+               "priority": "Alta",
+               "type": "Funcional",
+               "related": [
+                    "RF005",
+                    "RF007"
+               ],
+               "acceptance_criteria": [
+                    "Contador de curtidas atualiza",
+                    "Relação usuário-publicação armazenada/removida"
+               ]
+          },
+          {
+               "id": "RF007",
+               "title": "Comentar publicações",
+               "description": "Comentar, editar e apagar próprios comentários.",
+               "priority": "Alta",
+               "type": "Funcional",
+               "related": [
+                    "RF005",
+                    "RF006"
+               ],
+               "acceptance_criteria": [
+                    "Comentários mostram autor e timestamp",
+                    "Usuário pode editar/apagar seus comentários"
+               ]
+          },
+          {
+               "id": "RF008",
+               "title": "Pedidos de conexão",
+               "description": "Enviar solicitação de amizade/conexão para outros usuários.",
+               "priority": "Alta",
+               "type": "Funcional",
+               "related": [],
+               "acceptance_criteria": [
+                    "Botão 'Conectar' cria solicitação",
+                    "Estado pendente visível"
+               ]
+          },
+          {
+               "id": "RF009",
+               "title": "Aceitar/Recusar pedidos",
+               "description": "Aceitar ou recusar pedidos de conexão recebidos.",
+               "priority": "Alta",
+               "type": "Funcional",
+               "related": [
+                    "RF008",
+                    "RF010"
+               ],
+               "acceptance_criteria": [
+                    "Lista de solicitações recebidas",
+                    "Aceitar cria conexão, recusar remove solicitação"
+               ]
+          },
+          {
+               "id": "RF010",
+               "title": "Mensagens privadas",
+               "description": "Conversas entre amigos; envio para não-conectados via solicitação.",
+               "priority": "Alta",
+               "type": "Funcional",
+               "related": [
+                    "RF009"
+               ],
+               "acceptance_criteria": [
+                    "Conversas privadas armazenadas",
+                    "Solicitação de mensagem para não-conectados"
+               ]
+          },
+          {
+               "id": "RF011",
+               "title": "Sugestão de amigos",
+               "description": "Sugerir novos amigos com base no cadastro e conexões.",
+               "priority": "Alta",
+               "type": "Funcional",
+               "related": [
+                    "RF001",
+                    "RF006"
+               ],
+               "acceptance_criteria": [
+                    "Sugestões baseadas em interesses e conexões em comum"
+               ]
+          },
+          {
+               "id": "RF012",
+               "title": "Denúncia de conteúdo",
+               "description": "Permitir denúncia de publicações ou perfis com conteúdo ofensivo ou violador das regras.",
+               "priority": "Alta",
+               "type": "Funcional",
+               "related": [
+                    "RF003",
+                    "RF004",
+                    "RF005",
+                    "RF006",
+                    "RF007",
+                    "RF008"
+               ],
+               "acceptance_criteria": [
+                    "Ação de denunciar disponível",
+                    "Coleta de motivo/evidências"
+               ]
+          },
+          {
+               "id": "RF013",
+               "title": "Sinalização para moderação",
+               "description": "Conteúdo denunciado fica sinalizado para análise por moderadores.",
+               "priority": "Alta",
+               "type": "Funcional",
+               "related": [
+                    "RF012"
+               ],
+               "acceptance_criteria": [
+                    "Flag de moderação e fila para análise"
+               ]
+          }
+     ]
+}

@@ -1,0 +1,12 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Elance</title><link rel="stylesheet" href="style.css"/></head><body><div class="layout">
+<div class="side-left">
+  <div class="brand"><img src="assets/logo_enlace_5000px.png" alt="Elance"></div>
+  <a class="nav-item active" href="feed.html" title="Feed"><img src="assets/ic-home.svg" alt="Home"/></a>
+  <a class="nav-item" href="profile.html" title="Perfil"><img src="assets/ic-profile.svg" alt="Perfil"/></a>
+  <a class="nav-item" href="connections.html" title="Conexões"><img src="assets/ic-connections.svg" alt="Conexões"/></a>
+  <a class="nav-item" href="chat.html" title="Mensagens"><img src="assets/ic-chat.svg" alt="Mensagens"/></a>
+  <a class="nav-item" href="notifications.html" title="Notificações"><img src="assets/ic-bell.svg" alt="Notificações"/></a>
+  <a class="nav-item" href="settings.html" title="Configurações"><img src="assets/ic-gear.svg" alt="Config"/></a>
+<a class="nav-item" href="#" title="Sair" onclick="logout()"><img src="assets/ic-logout.svg" alt="Sair"/></a>
+</div>
+<main><div class="container" style="max-width:980px"><div class="card"><div class="bd profile-hero"><div id="u_avatar" class="avatar" style="width:92px;height:92px;font-size:22px">US</div><div><div id="u_name" style="font-weight:800;font-size:18px">Usuário</div><div id="u_bio" class="small muted"></div><div class="counts" style="margin-top:6px"><div id="u_counts"></div></div><div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn brand" id="btnConnect" onclick="connectViewed()">Conectar</button><button class="btn" onclick="startChatViewed()">Mensagem</button></div></div></div><div class="bd"><div class="badge" id="u_tags"></div><hr><div id="u_posts"></div></div></div></div></main></div><div id="toast" class="toast hidden"></div><script src="app.js"></script><script>ensureAuth && ensureAuth(); /* optional: user page renderer */</script></body></html>

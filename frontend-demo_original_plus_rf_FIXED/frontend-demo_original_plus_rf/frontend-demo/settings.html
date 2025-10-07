@@ -1,0 +1,21 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Elance</title><link rel="stylesheet" href="style.css"/></head><body><div class="layout">
+<div class="side-left">
+  <div class="brand"><img src="assets/logo_enlace_5000px.png" alt="Elance"></div>
+  <a class="nav-item active" href="feed.html" title="Feed"><img src="assets/ic-home.svg" alt="Home"/></a>
+  <a class="nav-item" href="profile.html" title="Perfil"><img src="assets/ic-profile.svg" alt="Perfil"/></a>
+  <a class="nav-item" href="connections.html" title="Conexões"><img src="assets/ic-connections.svg" alt="Conexões"/></a>
+  <a class="nav-item" href="chat.html" title="Mensagens"><img src="assets/ic-chat.svg" alt="Mensagens"/></a>
+  <a class="nav-item" href="notifications.html" title="Notificações"><img src="assets/ic-bell.svg" alt="Notificações"/></a>
+  <a class="nav-item" href="settings.html" title="Configurações"><img src="assets/ic-gear.svg" alt="Config"/></a>
+<a class="nav-item" href="#" title="Sair" onclick="logout()"><img src="assets/ic-logout.svg" alt="Sair"/></a>
+</div>
+<main><div class="container" style="max-width:820px"><div class="card"><div class="hd">Configurações</div><div class="bd"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><label>Tema</label><select id="theme" class="input"><option value="dark">Escuro</option><option value="light">Claro</option></select></div><div><label>Tamanho da fonte</label><select id="fontScale" class="input"><option value="100">100%</option><option value="110">110%</option><option value="120">120%</option></select></div></div><div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="btn brand" onclick="applySettings()">Aplicar</button><button class="btn ghost" onclick="resetDemo()">Resetar demo</button></div></div></div></div>
+    <div class="card" style="margin-top:16px">
+      <div class="hd">Resetar demo</div>
+      <div class="bd">
+        <p class="muted small">Apaga dados locais (contas, posts, conversas) e recarrega a página.</p>
+        <button id="reset-demo" class="btn ghost">Resetar demo</button>
+      </div>
+    </div>
+    
+</main></div><div id="toast" class="toast hidden"></div><script src="app.js"></script><script>ensureAuth && ensureAuth(); loadProfile && loadProfile();</script></body></html>

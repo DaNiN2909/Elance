@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="styles.css"></head>
+<body>
+
+<header>
+  <div class="title"><a href="index.html">Elance RF Layer</a></div>
+  <nav class="row small" style="gap:10px">
+    <a href="login.html">Login</a>
+    <a href="register.html">Cadastro</a>
+    <a href="feed.html">Feed</a>
+    <a href="profile.html">Perfil</a>
+    <a href="connections.html">Conexões</a>
+    <a href="chat.html">Mensagens</a>
+    <a href="notifications.html">Moderação</a>
+  </nav>
+</header>
+
+
+<main>
+  <div class="card">
+    <h2>Cadastro (RF001)</h2>
+    <div class="row" style="gap:16px">
+      <div class="grow">
+        <label>Nome completo</label><input id="rg_name">
+        <label>E-mail</label><input id="rg_email" type="email">
+        <label>Telefone</label><input id="rg_phone">
+        <label>Tipo</label>
+        <select id="rg_type">
+          <option value="Músico">Músico</option>
+          <option value="Contratante">Contratante</option>
+        </select>
+      </div>
+      <div class="grow">
+        <label>CEP</label><input id="rg_cep">
+        <label>Número</label><input id="rg_num">
+        <label>Cidade</label><input id="rg_city">
+        <label>Rua</label><input id="rg_street">
+        <label>Bairro</label><input id="rg_district">
+        <label>Senha</label><input id="rg_pass" type="password">
+      </div>
+    </div>
+    <div style="margin-top:12px"><button class="btn" id="submitSignUp">Cadastrar</button></div>
+  </div>
+</main>
+
+<script src="app.js"></script>
+<script src="login.js"></script>
+
+<script>
+// ENTER-SUBMIT register
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Enter'){ try{ register(); }catch(x){} }
+});
+</script>
+</body>
+</html>

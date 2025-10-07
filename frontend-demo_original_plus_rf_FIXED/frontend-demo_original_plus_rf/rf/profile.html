@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="styles.css"></head>
+<body>
+
+<header>
+  <div class="title"><a href="index.html">Elance RF Layer</a></div>
+  <nav class="row small" style="gap:10px">
+    <a href="login.html">Login</a>
+    <a href="register.html">Cadastro</a>
+    <a href="feed.html">Feed</a>
+    <a href="profile.html">Perfil</a>
+    <a href="connections.html">Conexões</a>
+    <a href="chat.html">Mensagens</a>
+    <a href="notifications.html">Moderação</a>
+  </nav>
+</header>
+
+
+<main>
+  <div class="grid">
+    <section>
+      <div class="card">
+        <h2>Perfil (RF003)</h2>
+        <label>Bio</label><textarea id="pf_bio" placeholder="Fale sobre você..."></textarea>
+        <label>Instrumentos (vírgulas)</label><input id="pf_instruments" placeholder="Guitarra, Bateria">
+        <label>Gêneros (vírgulas)</label><input id="pf_genres" placeholder="Rock, Pop">
+        <label>Avatar (URL)</label><input id="pf_avatar" placeholder="https://...">
+        <div style="margin-top:10px"><button class="btn" onclick="saveProfile()">Salvar</button></div>
+      </div>
+      <div class="card">
+        <h3>Portfólio (RF004)</h3>
+        <label>Título</label><input id="pf_port_title">
+        <label>URL (imagem, vídeo ou link)</label><input id="pf_port_url">
+        <label>Descrição</label><textarea id="pf_port_desc"></textarea>
+        <div style="margin-top:8px"><button class="btn" onclick="addPortfolio()">Adicionar</button></div>
+        <hr>
+        <div id="portfolioList"></div>
+      </div>
+    </section>
+    <aside>
+      <div class="card"><h3>Minhas conexões</h3><div id="myConnections"></div></div>
+    </aside>
+  </div>
+</main>
+<script>document.addEventListener('DOMContentLoaded',()=>{ensureAuth();loadProfile();renderMyConnections();renderPortfolio();});</script>
+
+<script src="app.js"></script>
+<script src="login.js"></script>
+</body>
+</html>
