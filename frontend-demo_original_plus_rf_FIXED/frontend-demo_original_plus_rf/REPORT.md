@@ -21,3 +21,13 @@ Este pacote adiciona uma **camada RF** (pasta `rf/`) sem remover ou sobrescrever
 4. Envie **solicitação de conexão**, aceite/recuse em `rf/connections.html`.
 5. Troque mensagens (para não amigos vira **solicitação**).
 6. Faça denúncias no feed ou em conexões e verifique em `rf/notifications.html`.
+
+### Fluxo de login/cadastro
+Para validar especificamente a tela ajustada de login/cadastro:
+
+1. **Suba um servidor estático** na pasta `frontend-demo/` (ex.: `npx http-server frontend-demo -p 4173`).
+2. Acesse `http://localhost:4173/login.html` no navegador.
+3. No formulário **Criar conta**, preencha todos os campos obrigatórios (nome, e-mail válido, CPF com 11 dígitos, telefone e senha com 8+ caracteres) e clique em **Cadastrar**.
+4. Confirme o alerta de sucesso e verifique se ocorre o redirecionamento automático para `feed.html` já autenticado.
+5. Abra uma nova aba anônima e repita o processo, mas agora use o bloco **Já tenho conta** para informar o e-mail/senha cadastrados. Ao prosseguir, você deve ser levado ao feed.
+6. Para garantir o logout, visite qualquer página com o botão “Sair” (por exemplo, `index.html` da camada RF), clique nele e confirme que o armazenamento `mg_currentUser` é limpo e o fluxo retorna à tela inicial.
