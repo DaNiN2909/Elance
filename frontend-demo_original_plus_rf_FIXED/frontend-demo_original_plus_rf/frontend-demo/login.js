@@ -15,40 +15,147 @@ if (signInButton && container) {
     });
 }
 
-// Helpers para storage e hashing
-function getUsers() {
+// Helpers para storage compatível com o restante da aplicação (com suporte a legado)
+function normalizeEmail(email) {
+    return (email || '').trim().toLowerCase();
+}
+
+function safeParseList(key) {
     try {
-        return JSON.parse(localStorage.getItem('users') || '[]');
+        const raw = localStorage.getItem(key);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
     } catch (e) {
         return [];
     }
 }
 
+function getStoredUsers() {
+    return safeParseList('mg_users');
+}
+
+function getLegacyUsers() {
+    return safeParseList('users');
+}
+
 function saveUsers(users) {
-    localStorage.setItem('users', JSON.stringify(users));
+    localStorage.setItem('mg_users', JSON.stringify(users));
+}
+
+function createHandle(name) {
+    const base = (name || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9]+/g, '')
+        .toLowerCase();
+    return base ? `@${base}` : `@user${Date.now()}`;
+}
+
+function getUsers() {
+    const map = new Map();
+
+    getStoredUsers().forEach(user => {
+        const email = normalizeEmail(user.email);
+        if (!email) return;
+        map.set(email, {
+            ...user,
+            email,
+            instruments: Array.isArray(user.instruments) ? user.instruments : [],
+            genres: Array.isArray(user.genres) ? user.genres : [],
+            following: Array.isArray(user.following) ? user.following : []
+        });
+    });
+
+    getLegacyUsers().forEach((legacyUser, index) => {
+        const email = normalizeEmail(legacyUser.email);
+        if (!email || map.has(email)) return;
+        const name = legacyUser.name || legacyUser.firstName || email.split('@')[0];
+        map.set(email, {
+            id: legacyUser.id || legacyUser.createdAt || `legacy-${index}`,
+            email,
+            pass: legacyUser.pass,
+            passwordHash: legacyUser.passwordHash,
+            name,
+            handle: legacyUser.handle || createHandle(name || email.split('@')[0]),
+            cpf: legacyUser.cpf || '',
+            phone: legacyUser.phone || '',
+            bio: legacyUser.bio || '',
+            avatar: legacyUser.avatar || '',
+            instruments: Array.isArray(legacyUser.instruments) ? legacyUser.instruments : [],
+            genres: Array.isArray(legacyUser.genres) ? legacyUser.genres : [],
+            following: Array.isArray(legacyUser.following) ? legacyUser.following : []
+        });
+    });
+
+    return Array.from(map.values());
+}
+
+function persistUserSnapshot(user) {
+    const email = normalizeEmail(user.email);
+    if (!email) return null;
+
+    const users = getStoredUsers();
+    const idx = users.findIndex(u => normalizeEmail(u.email) === email);
+    const existing = idx >= 0 ? users[idx] : {};
+    const name = user.name ?? existing.name ?? email.split('@')[0];
+
+    const record = {
+        id: user.id ?? existing.id ?? Date.now(),
+        email,
+        pass: user.pass ?? existing.pass ?? '',
+        passwordHash: user.passwordHash ?? existing.passwordHash ?? '',
+        name,
+        handle: user.handle ?? existing.handle ?? createHandle(name || email.split('@')[0]),
+        cpf: user.cpf ?? existing.cpf ?? '',
+        phone: user.phone ?? existing.phone ?? '',
+        bio: user.bio ?? existing.bio ?? '',
+        avatar: user.avatar ?? existing.avatar ?? '',
+        instruments: Array.isArray(user.instruments) ? user.instruments : (Array.isArray(existing.instruments) ? existing.instruments : []),
+        genres: Array.isArray(user.genres) ? user.genres : (Array.isArray(existing.genres) ? existing.genres : []),
+        following: Array.isArray(user.following) ? user.following : (Array.isArray(existing.following) ? existing.following : [])
+    };
+
+    if (idx >= 0) {
+        users[idx] = record;
+    } else {
+        users.push(record);
+    }
+
+    saveUsers(users);
+    return record;
 }
 
 async function hashPassword(password) {
-    const enc = new TextEncoder();
-    const data = enc.encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
+    if (!password) return '';
+    if (window.crypto?.subtle) {
+        const enc = new TextEncoder();
+        const data = enc.encode(password);
+        const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    return password;
 }
 
 // Cadastro de usuário
 const submitSignUp = document.getElementById('submitSignUp');
 if (submitSignUp) {
     submitSignUp.addEventListener('click', async () => {
-        const firstName = document.getElementById('firstName').value.trim()
-        const email = document.getElementById('email').value.trim().toLowerCase();
-        const cpf = document.getElementById('cpf').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-        const password = document.getElementById('password').value;
+        const firstNameInput = document.getElementById('firstName');
+        const emailInput = document.getElementById('email');
+        const cpfInput = document.getElementById('cpf');
+        const phoneInput = document.getElementById('phone');
+        const passwordInput = document.getElementById('password');
+
+        const firstName = firstNameInput ? firstNameInput.value.trim() : '';
+        const email = normalizeEmail(emailInput ? emailInput.value : '');
+        const cpf = cpfInput ? cpfInput.value.trim() : '';
+        const phone = phoneInput ? phoneInput.value.trim() : '';
+        const password = passwordInput ? passwordInput.value : '';
 
         // Verificar se todos os campos foram preenchidos
-        if (!firstName || !lastName || !email || !cpf || !birthDate || !gender || !phone || !password) {
+        if (!firstName || !email || !cpf || !phone || !password) {
             alert("Por favor, preencha todos os campos obrigatórios.");
             return;
         }
@@ -80,26 +187,28 @@ if (submitSignUp) {
         const passwordHash = await hashPassword(password);
 
         const newUser = {
-            firstName,
-            lastName,
+            id: Date.now(),
             email,
-            cpf,
-            birthDate,
-            gender,
-            phone,
+            pass: password,
             passwordHash,
-            createdAt: new Date().toISOString()
+            name: firstName,
+            handle: createHandle(firstName || email.split('@')[0]),
+            cpf,
+            phone,
+            bio: '',
+            avatar: '',
+            instruments: [],
+            genres: [],
+            following: []
         };
 
-        users.push(newUser);
-        saveUsers(users);
+        const persisted = persistUserSnapshot(newUser) || newUser;
 
         // Salvar sessão mock
-        localStorage.setItem('currentUserEmail', email);
-        localStorage.setItem('userName', firstName);
+        localStorage.setItem('mg_currentUser', String(persisted.id));
 
         alert("Cadastro concluído! Redirecionando...");
-        window.location.href = 'index.html'; // Redireciona o usuário
+        window.location.href = 'feed.html'; // Redireciona o usuário para o app
     });
 }
 
@@ -107,8 +216,11 @@ if (submitSignUp) {
 const submitLogin = document.getElementById('submitLogin');
 if (submitLogin) {
     submitLogin.addEventListener('click', async () => {
-        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-        const password = document.getElementById('loginPassword').value;
+        const emailInput = document.getElementById('loginEmail');
+        const passwordInput = document.getElementById('loginPassword');
+
+        const email = normalizeEmail(emailInput ? emailInput.value : '');
+        const password = passwordInput ? passwordInput.value : '';
 
         // Validação de campos obrigatórios
         if (!email || !password) {
@@ -129,54 +241,50 @@ if (submitLogin) {
             return;
         }
 
-        const passwordHash = await hashPassword(password);
-        if (passwordHash === user.passwordHash) {
-            // Recuperar nome do usuário do local storage
-            localStorage.setItem('currentUserEmail', email);
-            localStorage.setItem('userName', user.firstName);
-            alert(`Bem-vindo, ${user.firstName}!`);
-            window.location.href = "index.html"; // Redireciona para a próxima página
-        } else {
-            alert("E-mail ou senha incorretos. Tente novamente.");
+        let authenticated = false;
+        let passwordHashComputed = '';
+
+        if (user.pass && user.pass === password) {
+            authenticated = true;
+            passwordHashComputed = user.passwordHash || '';
         }
+
+        if (!authenticated && user.passwordHash) {
+            passwordHashComputed = await hashPassword(password);
+            if (passwordHashComputed === user.passwordHash) {
+                authenticated = true;
+            }
+        }
+
+        if (!authenticated) {
+            alert("E-mail ou senha incorretos. Tente novamente.");
+            return;
+        }
+
+        if (!passwordHashComputed) {
+            passwordHashComputed = await hashPassword(password);
+        }
+
+        const persisted = persistUserSnapshot({
+            ...user,
+            pass: password,
+            passwordHash: passwordHashComputed
+        }) || user;
+
+        localStorage.setItem('mg_currentUser', String(persisted.id));
+        alert(`Bem-vindo, ${persisted.name || persisted.email}!`);
+        window.location.href = "feed.html"; // Redireciona para a próxima página
     });
 }
 
-// Exibir nome e gerenciar logout no index.html
+// Atualizar o CTA de logout quando a página possuir o botão
 window.addEventListener('DOMContentLoaded', () => {
-    const userNameDisplay = document.getElementById('userNameDisplay');
-    const logoutMenu = document.getElementById('logoutMenu');
     const logoutButton = document.getElementById('logoutButton');
+    if (!logoutButton) return;
 
-    // Exibir o nome do usuário quando o elemento existir
-    const userName = localStorage.getItem('userName');
-    if (userName && userNameDisplay) {
-        userNameDisplay.textContent = `Olá, ${userName}`;
-    }
-
-    // Alternar exibição do menu de logout (protege se elementos não existirem)
-    if (userNameDisplay && logoutMenu) {
-        userNameDisplay.addEventListener('click', () => {
-            logoutMenu.style.display = logoutMenu.style.display === 'block' ? 'none' : 'block';
-        });
-    }
-
-    // Logout e redirecionamento
-    if (logoutButton) {
-        logoutButton.addEventListener('click', () => {
-            localStorage.removeItem('userName'); // Remove o nome do usuário
-            localStorage.removeItem('currentUserEmail');
-            alert("Você foi desconectado.");
-            window.location.href = 'login.html'; // Redireciona para a página de login
-        });
-    }
-
-    // Fechar o menu ao clicar fora (protege se logoutMenu não existir)
-    if (logoutMenu && userNameDisplay) {
-        document.addEventListener('click', (event) => {
-            if (!logoutMenu.contains(event.target) && event.target !== userNameDisplay) {
-                logoutMenu.style.display = 'none';
-            }
-        });
-    }
+    logoutButton.addEventListener('click', () => {
+        localStorage.removeItem('mg_currentUser');
+        alert("Você foi desconectado.");
+        window.location.href = 'index.html';
+    });
 });
